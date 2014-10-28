@@ -1,0 +1,122 @@
+
+apply plugin: "java"
+
+apply plugin: "idea"
+apply plugin: "eclipse"
+
+apply plugin: "sonar-runner"
+
+defaultTasks 'deployToSonar'
+
+repositories {
+    if (project.hasProperty('customMavenRepository')) {
+        maven {
+            url "$customMavenRepository";
+        }
+    }else{
+        mavenCentral()
+    }
+}
+
+
+//sourceSets {
+//    main {
+//        java {
+//            srcDir 'src/main'
+//        }
+//    }
+//}
+
+
+if (!sonarValidation.equals('java')) {
+    throw new GradleException("SONAR> Exactly one of the values 'sonarValidation=java' has to be set")
+}
+
+
+logger.lifecycle("SONAR> Sonar validation according $sonarValidation rules")
+
+
+sonarRunner{
+    sonarProperties {
+
+        // SONAR Local DEFAULT Settings (It is NOT necessary to change it!)
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.jdbc.url", "jdbc:h2:tcp://localhost:9092/sonar"
+        property "sonar.jdbc.driverClassName", "org.h2.Driver"
+        property "sonar.jdbc.username", "sonar"
+        property "sonar.jdbc.password", "sonar"
+
+        String name = "misak69-sonar-custom-resource" + " ($sonarValidation validation)"
+        String keyName = ":$sonarValidation" + "_validation:"
+
+        property "sonar.projectName", name
+        property "sonar.projectVersion", "misak69-sonar-custom-resource"
+        property "sonar.projectKey", keyName
+
+        property "sonar.java.coveragePlugin", "jacoco"
+
+        /**
+         *Analyzer's Log
+         */
+        property "sonar.verbose", false //Activate DEBUG mode for the analyzer.
+        property "sonar.showProfiling", false //Display logs to see where the analyzer spends time.
+
+        /*
+         * The strategy for language plugins is to no more execute tests but only reuse existing reports
+         * (to solve many integration issues with test & coverage frameworks).
+         * The consequence is that this feature becomes useless on the platform, and should be removed in a near future.
+         * It will be removed in the 5.x LTS version (approximatively end of 2014)
+         *
+         * # property "sonar.dynamicAnalysis", "reuseReports"
+         */
+
+
+        //org.sonar.api.utils.SonarException: Directory contains files belonging to different packages.
+        //Please fix your source code or use sonar.skipPackageDesign=true to continue the analysis.
+        //property "sonar.skipPackageDesign", true
+
+
+    }
+}
+
+subprojects {
+
+    sonarRunner {
+
+        sonarProperties {
+
+
+            println "sonar.project.name: ${project.name}"
+
+            /*Unit test definition for sonar*/
+            println "sonar.junit.reportsPath:${buildDir.path}/test-results/"
+            property "sonar.junit.reportsPath", "${buildDir.path}/test-results/"
+            property "sonar.jacoco.reportPath", "${buildDir.path}/jacoco/jacocoTest.exec"
+
+            //sonar.projectBaseDir
+            println "sonar.projectBaseDir: ${project.file('./')}"
+            property "sonar.projectBaseDir", "${project.file('./')}"
+            //property "sonar.jacoco.itReportPath", "${buildDir.path}/jacoco/jacocoIntegTest.exec"
+
+            property "sonar.sources", "${project.file('src/main/java').getAbsolutePath()}, ${project.file('src/main/resources').getAbsolutePath()}"
+            property "sonar.tests", "${project.file('src/test/java').getAbsolutePath()}"
+            property "sonar.binaries", "${buildDir.path}/classes/main/,${buildDir.path}/classes/test/"
+
+        }
+
+
+        afterEvaluate {
+
+            sonarProperties {
+                property "sonar.sourceEncoding", "UTF-8"
+                property "sonar.language", "$sonarValidation"
+            }
+
+            /*sonar.skipDesign - Skip the computation of design metrics and dependencies.Available for Java.*/
+            project.ext.set("skipDesign",true);
+            project.ext.set("skipDesignAnalysis",true);
+        }
+    }
+}
+
+
