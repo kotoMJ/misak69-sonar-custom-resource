@@ -1,0 +1,1 @@
+gradle --stacktrace -PsonarValidation=java sonarRunner

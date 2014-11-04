@@ -5,4 +5,14 @@ package cz.misak69.module_a.application.fo01_aModule;
  * Date: 2014.06.23
  */
 public class AModuleApplication {
+
+
+    AModuleApplication() {
+        try {
+            String a = null;
+            System.out.print(a.charAt(0));
+        } catch (NullPointerException npe) {
+            System.out.println("Test for analysing catching Null-pointer-exception");
+        }
+    }
 }
