@@ -1,3 +1,3 @@
-<h1>Sample project as resource for misak69-sonar-custom sonar analysis</h1>
+<h1>Sample project as resource for project <em>misak69-sonar-custom sonar analysis</em></h1>
 <br/>
-<div> run local sonar analysis by using command: <ul><li>gradle --stacktrace -PsonarValidation=java sonarRunner</li></ul>
+<div> run local sonar analysis by using <em>analyze.sh</em></div>
