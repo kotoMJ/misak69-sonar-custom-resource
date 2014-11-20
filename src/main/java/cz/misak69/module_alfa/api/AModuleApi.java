@@ -12,5 +12,9 @@ public class AModuleApi {
         System.out.print(BModuleImpl.MODULE_B_IMPL);
     }
 
+    public void actionMethod(){
+
+    }
+
 
 }

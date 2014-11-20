@@ -18,6 +18,19 @@ repositories {
     }
 }
 
+ext.libraries = [
+
+        "junit": [
+                [group: "junit", name: "junit", version: "4.10"],
+        ]
+]
+
+
+dependencies {
+    testCompile libraries["junit"]
+    testRuntime libraries["junit"]
+}
+
 
 //sourceSets {
 //    main {
@@ -27,13 +40,6 @@ repositories {
 //    }
 //}
 
-
-if (!sonarValidation.equals('java')) {
-    throw new GradleException("SONAR> Exactly one of the values 'sonarValidation=java' has to be set")
-}
-
-
-logger.lifecycle("SONAR> Sonar validation according $sonarValidation rules")
 
 
 sonarRunner{
@@ -82,6 +88,13 @@ sonarRunner{
 subprojects {
 
     sonarRunner {
+
+        if (!project.hasProperty('sonarValidation') || !sonarValidation.equals('java')) {
+            throw new GradleException("SONAR> Exactly one of the values 'sonarValidation=java' has to be set")
+        }
+        logger.lifecycle("SONAR> Sonar validation according $sonarValidation rules")
+
+
 
         sonarProperties {
 
